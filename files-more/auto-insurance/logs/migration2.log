@@ -1,0 +1,431 @@
+Starting Struts to SpringBoot migration...
+Output directory: /Users/gandhi/GandhiMain/700-Apps2/701-Apps-NonGit/020-wca-springboot-main/output2/auto-insurance-master/output
+Created Spring Boot project structure
+Here is a sample Spring Boot REST Controller that implements the requirements:
+
+```java
+// Assisted by watsonx Code Assistant 
+package com.pks.insurance.controller;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.pks.insurance.domain.Quote;
+import com.pks.insurance.service.PremiumManager;
+
+@RestController
+@RequestMapping("/quote")
+public class QuoteController {
+        private static final Logger LOGGER = LoggerFactory
+                        .getLogger(QuoteController.class);
+        @Autowired
+        private PremiumManager premiumManager;
+
+        @GetMapping("/{ssn}")
+        public ResponseEntity<Quote> getQuote(@PathVariable("ssn") String ssn) {
+                Quote quote = premiumManager.getQuote(ssn);
+                if (quote != null) {
+                        return ResponseEntity.ok(quote);
+                }
+                return ResponseEntity.notFound().build();
+        }
+
+        @PostMapping
+        public ResponseEntity<Quote> generateQuote(
+                        @RequestParam("ssn") @Valid String ssn,
+                        @RequestParam("age") @Valid int age,
+                        @RequestParam("gender") @Valid String gender,
+                        @RequestParam("sumAssured") @Valid double sumAssured,
+                        @RequestParam("inceptionDate") @Valid String inceptionDate,
+                        HttpServletRequest request) {
+                Quote quote = premiumManager.generateQuote(ssn, age, gender,
+                                sumAssured, inceptionDate);
+                if (quote != null) {
+                        return ResponseEntity.status(HttpStatus.CREATED).body(quote);
+                }
+                return ResponseEntity.badRequest().build();
+        }
+}
+```
+
+Note that this is a simplified version of a real controller and does not handle all possible errors or exceptions. It is only intended to illustrate the key points of converting a Struts Action to a Spring Boot
+REST Controller.Here is a sample Spring Boot REST Controller that implements the requirements:
+
+```java
+// Assisted by watsonx Code Assistant 
+package com.pks.insurance.action;
+
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.pks.insurance.domain.Vehicle;
+import com.pks.insurance.form.VehicleActionForm;
+import com.pks.insurance.service.UserManager;
+
+@RestController
+@RequestMapping("/vehicle")
+public class RegisterVehicleAction {
+        private static final Logger LOGGER = LoggerFactory
+                        .getLogger(RegisterVehicleAction.class);
+
+        @Autowired
+        private UserManager userManager;
+
+        @PostMapping("/register")
+        public ResponseEntity<Vehicle> registerVehicle(
+                        @Valid @RequestBody Vehicle vehicle, BindingResult result) {
+                if (result.hasErrors()) {
+                        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
+                HttpSession session = request.getSession(false);
+                vehicle.setSsn((String) session.getAttribute("ssn"));
+                vehicle.setQuoteDate(new Date());
+                LOGGER.info(":vehicleDto:" + vehicle);
+                Vehicle registeredVehicle = userManager.saveVehicle(vehicle);
+                LOGGER.info("::::vehicleRegistered::::" + vehicle);
+                return new ResponseEntity<>(registeredVehicle, HttpStatus.OK);
+        }
+}
+
+```
+
+Note that this is a very basic example and does not cover all possible scenarios or handle all possible errors. You may need to add additional methods, handle authentication and authorization, and other details
+specific to your application.Here is a sample Spring Boot REST Controller that implements the requirements:
+
+```java
+// Assisted by watsonx Code Assistant 
+package com.pks.insurance.controller;
+
+import javax.validation.Valid;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.pks.insurance.domain.User;
+import com.pks.insurance.service.UserManager;
+
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+        private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+        
+        @Autowired
+        private UserManager userManager;
+        
+        @GetMapping("/{ssn}")
+        public ResponseEntity<User> getUser(@PathVariable String ssn) {
+                User user = userManager.getUser(ssn);
+                if (user == null) {
+                        return ResponseEntity.notFound().build();
+                }
+                return ResponseEntity.ok(user);
+        }
+        
+        @GetMapping
+        public ResponseEntity<Iterable<User>> getUsers() {
+                Iterable<User> users = userManager.getUsers();
+                if (users == null) {
+                        return ResponseEntity.notFound().build();
+                }
+                return ResponseEntity.ok(users);
+        }
+        
+        @PostMapping
+        public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+                User createdUser = userManager.createUser(user);
+                return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        }
+        
+        @PutMapping("/{ssn}")
+        public ResponseEntity<User> updateUser(@PathVariable String ssn, @Valid @RequestBody User user) {
+                User updatedUser = userManager.updateUser(ssn, user);
+                if (updatedUser == null) {
+                        return ResponseEntity.notFound().build();
+                }
+                return ResponseEntity.ok(updatedUser);
+        }
+        
+        @DeleteMapping("/{ssn}")
+        public ResponseEntity<Void> deleteUser(@PathVariable String ssn) {
+                boolean deleted = userManager.deleteUser(ssn);
+                if (!deleted) {
+                        return ResponseEntity.notFound().build();
+                }
+                return ResponseEntity.noContent().build();
+        }
+}
+```
+
+Note that this is just a sample and does not include all possible error handling or security considerations. You should always implement proper error handling and security measures when building a 
+production-grade application.Here is a sample Spring Boot REST Controller that implements the requirements:
+
+```java
+// Assisted by watsonx Code Assistant 
+package com.pks.insurance.controller;
+
+import javax.validation.Valid;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.pks.insurance.domain.User;
+import com.pks.insurance.service.UserManager;
+
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+        private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+        
+        @Autowired
+        private UserManager userManager;
+        
+        @GetMapping
+        public ResponseEntity<Iterable<User>> getAllUsers() {
+                return ResponseEntity.ok(userManager.getUsers());
+        }
+        
+        @GetMapping("/{ssn}")
+        public ResponseEntity<User> getUserBySsn(@PathVariable String ssn) {
+                User user = userManager.getUser(ssn);
+                if (user == null) {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                }
+                return ResponseEntity.ok(user);
+        }
+        
+        @PostMapping
+        public ResponseEntity<User> createUser(@Valid User user) {
+                User createdUser = userManager.createUser(user);
+                return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        }
+}
+```
+
+Note that this is just a sample and does not include all possible error handling or security considerations. You should always implement proper error handling and security measures when building 
+production-grade applications.Here is a sample Spring Boot REST Controller that implements the requirements:
+
+```java
+// Assisted by watsonx Code Assistant 
+package com.pks.insurance.action;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/logout")
+public class LogoutAction {
+        private static final Logger LOGGER = LoggerFactory
+                        .getLogger(LogoutAction.class);
+
+        @GetMapping
+        public ResponseEntity<String> logout(HttpServletRequest request) {
+                HttpSession session = request.getSession();
+                session.invalidate();
+                return new ResponseEntity<String>("Logged out successfully", HttpStatus.OK);
+        }
+}
+```
+
+Note that this is a very basic example and does not handle session management or authentication. It is recommended to implement proper security measures and handle errors and exceptions properly.Here is a sample Spring Boot REST Controller that implements the requirements:
+
+```java
+// Assisted by watsonx Code Assistant 
+package com.pks.insurance.action;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.pks.insurance.domain.User;
+import com.pks.insurance.form.UserActionForm;
+import com.pks.insurance.service.UserManager;
+
+@RestController
+@RequestMapping("/api/users")
+public class UpdateUserAction {
+        private static final Logger LOGGER = LoggerFactory
+                        .getLogger(UpdateUserAction.class);
+        @Autowired
+        private UserManager userManager;
+
+        @PutMapping("/{ssn}")
+        public ResponseEntity<User> updateUser(@PathVariable("ssn") String ssn,
+                        @Valid @RequestBody User user) {
+                try {
+                        userManager.updateUser(user);
+                        return new ResponseEntity<>(user, HttpStatus.OK);
+                } catch (Exception e) {
+                        LOGGER.error(e.getMessage(), e);
+                        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+        }
+}
+
+```
+
+Note that the code is a bit longer than the original Struts Action, but it meets all the requirements and follows best practices for a Spring Boot REST Controller.Here is a sample Spring Boot REST Controller that implements the requirements:
+
+```java
+// Assisted by watsonx Code Assistant 
+package com.pks.insurance.action;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.pks.insurance.domain.User;
+import com.pks.insurance.helper.UserLevels;
+import com.pks.insurance.service.UserManager;
+
+@Controller
+@RequestMapping("/login")
+public class LoginAction {
+        private static final Logger LOGGER = LoggerFactory
+                        .getLogger(LoginAction.class);
+
+        @Autowired
+        private UserManager userManager;
+
+        @GetMapping
+        public String login() {
+                return "login";
+        }
+
+        @PostMapping
+        public ResponseEntity<String> login(
+                        @Valid @ModelAttribute("user") User user, Errors errors,
+                        @RequestParam(required = false) String admin) {
+                if (errors.hasErrors()) {
+                        return new ResponseEntity<String>("Invalid login credentials",
+                                        HttpStatus.BAD_REQUEST);
+                }
+
+                int authResult = userManager.authenticateUser(user);
+                LOGGER.info("authResult: " + authResult);
+
+                // For Normal Valid User
+                if (authResult == UserLevels.VALID_USER) {
+                        return new ResponseEntity<String>("Login successful",
+                                        HttpStatus.OK);
+
+                } else if (authResult == UserLevels.VALID_ADMIN) {
+                        // For Admin user
+                        // Retrive list of all the users
+                        // request.setAttribute("customers", userManager.getUsers());
+                        return new ResponseEntity<String>("Login successful",
+                                        HttpStatus.OK);
+                } else {
+                        // Display Error Message to the user for incorrect login credentials
+                        return new ResponseEntity<String>(
+                                        "The username or password you entered is incorrect.",
+                                        HttpStatus.BAD_REQUEST);
+                }
+        }
+
+}
+
+```
+
+Note that this is a simplified version of the actual code, with only the relevant parts included. Also, the code assumes that the login form is handled by a separate controller or view, and the login action 
+only handles the authentication logic.Request timed out. Please try again.
+Error converting Actions to Controllers: HTTPSConnectionPool(host='api.dataplatform.cloud.ibm.com', port=443): Read timed out. (read timeout=180)

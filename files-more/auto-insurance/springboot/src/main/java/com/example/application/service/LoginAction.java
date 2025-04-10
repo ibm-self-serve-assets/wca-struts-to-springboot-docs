@@ -1,0 +1,1 @@
+//The code suggestion that you requested is similar to code found in https://github.com/sonipks/auto-insurance/tree/master/trunk/src/main/java/com/pks/insurance/action/LoginAction.java licensed under apache-2.0. Code suggestions that are similar to code sources under this licence are blocked. Retry with a more specific request or ask your administrator for help.

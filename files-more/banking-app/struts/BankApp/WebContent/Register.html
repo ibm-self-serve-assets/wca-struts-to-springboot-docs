@@ -1,0 +1,23 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+		<title>The Register Page</title>
+	</head>
+	<body>
+		<h1><b><u>Enter your personal information:</u></b></h1>
+		<form method="Post" action ="BankingServlet">
+			<label for="name">Enter your Name </label>
+			<input type="text" id="name" name="name"/><br><br>
+			<label for="password">Enter your Password </label>
+			<input type="password" id="password" name="password"/><br><br>
+			<label for="address">Enter your Address </label>
+			<input type="text" id="address" name="address"/><br><br>
+			<label for="balance">Enter your Initial Deposit </label>
+			<input type="text" id="initDeposit" name="initDeposit"/><br><br>
+			<input type="hidden" name="operation" value="registerUser"/>
+			<input type="submit" value="Submit Form"/>
+			<input type="reset" value="Reset From"/>
+		</form>
+	</body>
+</html>

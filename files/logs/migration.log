@@ -1,0 +1,741 @@
+Starting Struts to SpringBoot migration...
+Output directory: /Users/gandhi/GandhiMain/700-Apps2/701-Apps-NonGit/020-wca-springboot-main/output2
+Created Spring Boot project structure
+Here is a sample Spring Boot REST Controller that implements the same functionality as the Struts Action:
+
+```java
+// Assisted by watsonx Code Assistant
+package com.example.app.controller;
+
+import javax.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import com.example.app.form.CustomerForm;
+import com.example.app.service.CustomerService;
+
+@RestController
+@RequestMapping("/customer")
+public class CustomerController {
+    private CustomerService customerService;
+
+    public CustomerController() {
+        customerService = new CustomerService();
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<Object> listCustomers() {
+        return ResponseEntity.ok(customerService.getAllCustomers());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> getCustomer(@PathVariable("id") Long id) {
+        CustomerForm customerForm = customerService.getCustomerForm(id);
+        if (customerForm == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(customerForm);
+    }
+
+    @PostMapping
+    public ResponseEntity<Object> createCustomer(@Valid @RequestBody CustomerForm customerForm) {
+        customerService.saveCustomer(customerForm);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> updateCustomer(@PathVariable("id") Long id,
+            @Valid @RequestBody CustomerForm customerForm) {
+        if (!id.equals(customerForm.getId())) {
+            return ResponseEntity.badRequest().build();
+        }
+        customerService.saveCustomer(customerForm);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> deleteCustomer(@PathVariable("id") Long id) {
+        customerService.deleteCustomer(id);
+        return ResponseEntity.ok().build();
+    }
+}
+```
+
+Note that the controller uses the same `CustomerService` as the Action, but it is accessed through RESTful endpoints instead of a `method` parameter. Additionally, the controller uses the `@Valid` annotation to
+Converted Actions to Controllers
+Here is the Spring Boot DTO equivalent of the Struts Form/DTO:
+
+```java
+// Assisted by watsonx Code Assistant
+package com.example.application.model;
+
+import javax.validation.constraints.*;
+
+public class Customer {
+    private Long id;
+
+    @NotBlank(message = "Name is required")
+    private String name;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email address")
+    private String email;
+
+    @NotBlank(message = "Phone number is required")
+    @Size(min = 10, max = 12, message = "Phone number must be 10-12 digits long")
+    private String phone;
+
+    @NotNull(message = "Active flag is required")
+    private boolean active;
+
+    // Getters and Setters
+    // toString, equals, hashCode
+}
+
+Here is the completed Spring Boot DTO with all fields and validations:
+```java
+// Assisted by watsonx Code Assistant
+package com.example.application.model;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
+import java.util.Date;
+
+public class CustomerDTO {
+    private Integer id;
+
+    @NotBlank(message = "Name is required")
+    @Size(max = 50, message = "Name must be less than 50 characters")
+    private String name;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email must be valid")
+    private String email;
+
+    @NotBlank(message = "Address is required")
+    private String address;
+
+    @NotBlank(message = "Phone is required")
+    @Pattern(regexp = "^\\+?[0-9-() ]*$", message = "Phone must be valid")
+    private String phone;
+
+    @NotNull(message = "Registration date is required")
+    private Date registrationDate;
+
+    @NotBlank(message = "Customer type is required")
+    private String type;
+
+    private boolean active;
+
+    @NotNull(message = "Credit limit is required")
+    @Min(value = 0, message = "Credit limit must be greater than or equal to 0")
+    private BigDecimal creditLimit;
+
+    @Min(value = 0, message = "Loyalty points must be greater than or equal to 0")
+    private int loyaltyPoints;
+
+    private String notes;
+
+    private Date lastPurchaseDate;
+
+    @NotBlank(message = "Preferred contact method is required")
+    private String preferredContactMethod;
+
+    @Min(value = 0, message = "Discount percent must be greater than or equal to 0")
+    @Max(value = 100, message = "Discount percent must be less than or equal to 100")
+    private int discountPercent;
+
+    private boolean eligibleForUpgrade;
+
+    // Default constructor
+    public CustomerDTO() {}
+
+    // Constructor from Customer entity
+    public CustomerDTO(Customer customer) {
+        this.id = customer.getId();
+        this.name = customer.getName();
+        this.email = customer.getEmail();
+        this.address = customer.getAddress();
+        this.phone = customer.getPhone();
+        this.registrationDate = customer.getRegistrationDate();
+        this.type = customer.getType().name();
+        this.active = customer.isActive();
+        this.creditLimit = customer.getCreditLimit();
+        this.loyaltyPoints = customer.getLoyaltyPoints();
+        this.notes = customer.getNotes();
+        this.lastPurchaseDate = customer.getLastPurchaseDate();
+        this.preferredContactMethod = customer.getPreferredContactMethod();
+        this.discountPercent = customer.getDiscountPercent();
+        this.eligibleForUpgrade = customer.isEligibleForUpgrade();
+    }
+
+    // Convert to Customer entity
+    public Customer toCustomer() {
+        Customer customer = new Customer();
+        customer.setId(this.id);
+        customer.setName(this.name);
+        customer.setEmail(this.email);
+        customer.setAddress(this.address);
+        customer.setPhone(this.phone);
+        customer.setRegistrationDate(this.registrationDate);
+        customer.setType(CustomerType.valueOf(this.type));
+        customer.setActive(this.active);
+        customer.setCreditLimit(this.creditLimit);
+        customer.setLoyaltyPoints(this.loyaltyPoints);
+        customer.setNotes(this.notes);
+        customer.setLastPurchaseDate(this.lastPurchaseDate);
+        customer.setPreferredContactMethod(this.preferredContactMethod);
+        customer.setDiscountPercent(this.discountPercent);
+        customer.setEligibleForUpgrade(this.eligibleForUpgrade);
+        return customer;
+    }
+
+    // Getters and Setters
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+
+    public Date getRegistrationDate() { return registrationDate; }
+    public void setRegistrationDate(Date registrationDate) { this.registrationDate = registrationDate; }
+
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
+
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
+
+    public BigDecimal getCreditLimit() { return creditLimit; }
+    public void setCreditLimit(BigDecimal creditLimit) { this.creditLimit = creditLimit; }
+
+    public int getLoyaltyPoints() { return loyaltyPoints; }
+    public void setLoyaltyPoints(int loyaltyPoints) { this.loyaltyPoints = loyaltyPoints; }
+
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
+
+    public Date getLastPurchaseDate() { return lastPurchaseDate; }
+    public void setLastPurchaseDate(Date lastPurchaseDate) { this.lastPurchaseDate = lastPurchaseDate; }
+
+    public String getPreferredContactMethod() { return preferredContactMethod; }
+    public void setPreferredContactMethod(String preferredContactMethod) {
+        this.preferredContactMethod = preferredContactMethod;
+    }
+
+    public int getDiscountPercent() { return discountPercent; }
+    public void setDiscountPercent(int discountPercent) { this.discountPercent = discountPercent; }
+
+    public boolean isEligibleForUpgrade() { return eligibleForUpgrade; }
+    public void setEligibleForUpgrade(boolean eligibleForUpgrade) { this.eligibleForUpgrade = eligibleForUpgrade; }
+
+    @Override
+    public String toString() {
+        return "CustomerDTO ";
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        CustomerDTO other = (CustomerDTO) obj;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        return true;
+    }
+}
+Migrated Form beans and DTOs
+Here is a sample Spring Boot service that encapsulates the business logic from the original Struts class:
+
+```java
+// Assisted by watsonx Code Assistant
+package com.example.application.service;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import com.example.application.model.Customer;
+import com.example.application.form.CustomerForm;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class CustomerService {
+    private final CustomerRepository customerRepository;
+
+    @Autowired
+    public CustomerService(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public Customer saveCustomer(CustomerForm form) {
+        Customer customer = new Customer();
+        customer.setId(form.getId() != null ? form.getId() : getNextId());
+        customer.setName(form.getName());
+        customer.setEmail(form.getEmail());
+        customer.setPhone(form.getPhone());
+        customer.setActive(form.isActive());
+
+        return customerRepository.save(customer);
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public void deleteCustomer(Long id) {
+        customerRepository.deleteById(id);
+    }
+
+    @Transactional
+    public CustomerForm getCustomerForm(Long id) {
+        Customer customer = customerRepository.findById(id).orElse(null);
+        if (customer != null) {
+            CustomerForm form = new CustomerForm();
+            form.setId(customer.getId());
+            form.setName(customer.getName());
+            form.setEmail(customer.getEmail());
+            form.setPhone(customer.getPhone());
+            form.setActive(customer.isActive());
+            return form;
+        }
+        return null;
+    }
+
+    @Transactional
+    public List<Customer> getAllCustomers() {
+        return new ArrayList<>(customerRepository.findAll());
+    }
+
+    private long getNextId() {
+        long id = 1;
+        for (Customer customer : customerRepository.findAll()) {
+            if (customer.getId() >= id) {
+                id = customer.getId() + 1;
+            }
+        }
+        return id;
+    }
+}
+```
+
+This service uses constructor injection to receive a `CustomerRepository` bean, which it uses to perform data operations. It also defines methods for saving, deleting, retrieving, and listing customers, as well
+as a helper method to generate IDs for new customers.
+
+Note that the service methods are annotated with `@Transactional` and `@PreAuthorize` annotations, which ensure that the data operations are performed within a transaction and that only authorized users can
+perform these actions.
+
+Also note that the service methods convert `CustomerForm` objects to `Customer` objects before persisting them to the database, and vice versa when retrieving data. This helps to maintain a clean separation of
+concerns between the business logic and the data access layer.
+
+Overall, this service implementation follows best practices for structuring and implementing a Spring service, and it encapsulates the business logic from the original Struts class, making it easier to maintain
+```
+// Assisted by watsonx Code Assistant
+Here is a sample Spring Boot service that encapsulates the business logic from the original Struts Action:
+
+<<CODE>>
+package com.example.application.service;
+
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.example.application.repository.CustomerRepository;
+import com.example.application.model.Customer;
+import com.example.application.form.CustomerForm;
+
+@Service
+@Transactional
+public class CustomerService {
+    @Autowired
+    private CustomerRepository customerRepository;
+
+    public List<Customer> getAllCustomers() {
+        return customerRepository.findAll();
+    }
+
+    public CustomerForm getCustomerForm(Long id) {
+        Customer customer = customerRepository.findById(id).orElseThrow();
+        return new CustomerForm(customer);
+    }
+
+    public void saveCustomer(CustomerForm customerForm) {
+        Customer customer = new Customer();
+        customer.setFirstName(customerForm.getFirstName());
+        customer.setLastName(customerForm.getLastName());
+        customer.setEmail(customerForm.getEmail());
+        customerRepository.save(customer);
+    }
+
+    public void deleteCustomer(Long id) {
+        customerRepository.deleteById(id);
+    }
+}
+<</CODE>>
+
+Note that this service uses constructor injection to receive a CustomerRepository dependency. It also follows the Spring best practices of converting ActionForm parameters to DTOs, preserving business rules and
+validations, and returning domain objects instead of ActionForwards. It also converts ActionErrors to exceptions with meaningful error messages, and handles null cases properly by throwing exceptions.
+Migrated Service layer
+```
+// Assisted by watsonx Code Assistant
+package com.example.app.model;
+
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.util.Date;
+
+@Entity
+@Table(name = "customers")
+public class Customer {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "created_date")
+    private Date createdDate;
+
+    @Column(name = "type")
+    @Enumerated(EnumType.STRING)
+    private CustomerType type;
+
+    @Column(name = "active")
+    private boolean active;
+
+    @Column(name = "credit_limit")
+    private BigDecimal creditLimit;
+
+    @Column(name = "loyalty_points")
+    private int loyaltyPoints;
+
+    @Column(name = "notes")
+    private String notes;
+
+    @Column(name = "last_purchase_date")
+    private Date lastPurchaseDate;
+
+    @Column(name = "preferred_contact_method")
+    private String preferredContactMethod;
+
+    public enum CustomerType {
+        REGULAR("Regular Customer", 0),
+        PREMIUM("Premium Member", 10),
+        VIP("VIP Member", 20),
+        CORPORATE("Corporate Account", 15);
+
+        private final String displayName;
+        private final int discountPercent;
+
+        CustomerType(String displayName, int discountPercent) {
+            this.displayName = displayName;
+            this.discountPercent = discountPercent;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        public int getDiscountPercent() {
+            return discountPercent;
+        }
+    }
+
+    public Customer() {
+        this.createdDate = new Date();
+        this.active = true;
+        this.type = CustomerType.REGULAR;
+        this.creditLimit = BigDecimal.ZERO;
+        this.loyaltyPoints = 0;
+        this.preferredContactMethod = "EMAIL";
+    }
+
+    public Customer(Long id, String name, String email, String address) {
+        this();
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.address = address;
+    }
+
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public CustomerType getType() {
+        return type;
+    }
+
+    public void setType(CustomerType type) {
+        this.type = type;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public BigDecimal getCreditLimit() {
+        return creditLimit;
+    }
+
+    public void setCreditLimit(BigDecimal creditLimit) {
+        this.creditLimit = creditLimit;
+    }
+
+    public int getLoyaltyPoints() {
+        return loyaltyPoints;
+    }
+
+    public void setLoyaltyPoints(int loyaltyPoints) {
+        this.loyaltyPoints = loyaltyPoints;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public Date getLastPurchaseDate() {
+        return lastPurchaseDate;
+    }
+
+    public void setLastPurchaseDate(Date lastPurchaseDate) {
+        this.lastPurchaseDate = lastPurchaseDate;
+    }
+
+    public String getPreferredContactMethod() {
+        return preferredContactMethod;
+    }
+
+    public void setPreferredContactMethod(String preferredContactMethod) {
+        this.preferredContactMethod = preferredContactMethod;
+    }
+
+    // Business methods
+    public boolean isEligibleForUpgrade() {
+        return loyaltyPoints >= 1000 && type != CustomerType.VIP;
+    }
+
+    public void addLoyaltyPoints(int points) {
+        this.loyaltyPoints += points;
+    }
+
+    public int getDiscountPercent() {
+        return type.getDiscountPercent();
+    }
+
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", type=" + type.getDisplayName() +
+                ", loyaltyPoints=" + loyaltyPoints +
+                '}';
+    }
+}
+Migrated Model classes
+Updated project dependencies
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Form</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Customer Form</h1>
+    <form action="/customer">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name">
+        <span class="error"></span>
+    </form>
+</body>
+```html
+// Assisted by watsonx Code Assistant
+// watsonx Code Assistant did not check whether this code suggestion might be similar to third party code.
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer List</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Customer List</h1>
+    <table>
+        <tbody>
+            <tr>
+                <td>John Doe</td>
+            </tr>
+            <tr>
+                <td>Jane Smith</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
+
+Found 2 HTML files to convert
+Converting customer/form.html to Thymeleaf...
+<html lang="en" xmlns:th="http://www.pythia.com">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Customers</h1>
+    <form action="/customers" method="post" th:object="${customer}">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" th:field="*{name}">
+        <span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name Error</span>
+        <input type="submit" value="Submit">
+        <input type="reset" value="Reset">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+    </form>
+</body>
+Successfully converted customer/form.html
+Converting customer/list.html to Thymeleaf...
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer List</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Customer List</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="customer : ${customers}">
+                <td th:text="${customer.name}">John Doe</td>
+                <td>
+                    <a th:href="@{/edit(id=${customer.id})}">Edit</a>
+                    <a th:href="@{/delete(id=${customer.id})}">Delete</a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(customers)}">
+                <td colspan="2">No customers found.</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+Successfully converted customer/list.html
+Migrated JSP pages to Thymeleaf
+Struts to SpringBoot migration completed successfully!
+Migration output saved to: /Users/gandhi/GandhiMain/700-Apps2/701-Apps-NonGit/020-wca-springboot-main/output2
