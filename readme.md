@@ -26,24 +26,28 @@ The sample struts code, the converted springboot code and the logs are given for
         <th>Struts Code</th>
         <th>Converted springboot code</th>
         <th>Logs</th>
+        <th>Fix Instruction</th>
     </thead>
     <tr>
         <td>Sample App</td>
         <td><a href="./files/struts">Link</a></td>
         <td><a href="./files/springboot">Link</a></td>
         <td><a href="./files/logs/migration.log">Link</a></td>
+        <td><a href="./fix/app1">Link</a></td>
    </tr>   
     <tr>
         <td>Auto Insurance</td>
         <td><a href="./files-more/auto-insurance/struts">Link</a></td>
         <td><a href="./files-more/auto-insurance/springboot">Link</a></td>
         <td><a href="./files-more/auto-insurance/logs/migration.log">Link</a></td>
+        <td></td>
    </tr> 
     <tr>
         <td>Banking</td>
         <td><a href="./files-more/banking-app/struts">Link</a></td>
         <td><a href="./files-more/banking-app/springboot">Link</a></td>
         <td><a href="./files-more/banking-app/logs/migration.log">Link</a></td>
+        <td></td>
    </tr>        
 </table>
 
