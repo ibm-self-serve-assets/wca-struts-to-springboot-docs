@@ -18,7 +18,7 @@ Path : src/main/java/com/example/application/MyApp.java
 
 #### Create file
 
-1. Create this file with the content as like this <a href="./springboot-fixed/src/main/java/com/example/application/MyApp.java">this</a>
+1. Create this file with the content as like <a href="./springboot-fixed/src/main/java/com/example/application/MyApp.java">this</a>
 
 ### 1.2 pom.xml
     
@@ -26,7 +26,7 @@ Path : pom.xml
 
 #### Update file
 
-1. Add the depedency entries for `h2` and `thymeleaf` as like this <a href="./springboot-fixed/pom.xml">this</a>
+1. Add the depedency entries for `h2` and `thymeleaf` as like <a href="./springboot-fixed/pom.xml">this</a>
 
 ### 1.3 application.properties
     
@@ -35,7 +35,7 @@ Path : /resources/application.properties
 #### Create file
 
 1. Create this file.
-2. Add the entries for `h2`  like this <a href="./springboot-fixed/src/main/resources/application.properties">this</a>
+2. Add the entries for `h2`  like <a href="./springboot-fixed/src/main/resources/application.properties">this</a>
 
 
 ## 2. Module specific changes
@@ -78,7 +78,6 @@ Path : src/main/java/com/example/application/model/Customer.java
 
 1. Change the package `package com.example.app.model;` into `package com.example.application.model;`
 
-
 ### 2.4 CustomerDTO.java
 
 Path : src/main/java/com/example/application/model/CustomerDTO.java
@@ -107,7 +106,7 @@ Path : src/main/java/com/example/application/repository/CustomerRepository.java
 
 #### Create file
 
-1. Create this file with the content as like this <a href="./springboot-fixed/src/main/java/com/example/application/repository/CustomerRepository.java">this</a>
+1. Create this file with the content as like <a href="./springboot-fixed/src/main/java/com/example/application/repository/CustomerRepository.java">this</a>
 
 ### 2.6 CustomerService.java
 
