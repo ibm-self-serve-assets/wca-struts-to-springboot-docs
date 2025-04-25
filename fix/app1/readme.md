@@ -4,11 +4,9 @@ This documentation explains about the quick changes needed in the Springboot cod
 
 A Struts application containing a Customer module with CRED operations has been migrated to Spring Boot. Once the code is migrated, few changes to be done in the migrated code. This document explains about the chnanges required to done.
 
-Source Code References :   
+**Source Code References :** <a href="./struts">Struts Code</a>  |  <a href="./springboot-org">Generated Springboot Code</a>    |   <a href="./springboot-fixed">Fixed Springboot Code</a>
 
-<a href="./struts">Struts Code</a>  |  <a href="./springboot-org">Generated Springboot Code</a>    |   <a href="./springboot-fixed">Fixed Springboot Code</a>
-
-See the document <a href="https://github.com/ibm-self-serve-assets/wca-struts-to-springboot-docs">here</a> for more information on migration.
+**Migration Process :** See the document <a href="https://github.com/ibm-self-serve-assets/wca-struts-to-springboot-docs">here</a> for more information on migration.
 
 ## 1. Common files changes
 
@@ -42,7 +40,7 @@ Path : /resources/application.properties
 
 ## 2. Module specific changes
 
-These changes to be done for all modules/entities. Ex: Customer, User, 
+For each module/screen/entities, classes like Controller, DTO, Entity, Repository and Service are generated. For one module (Customer), the changes required are explained here. You may need to repeat the changes for each module.
 
 ### 2.1 CustomerAction.java
 
